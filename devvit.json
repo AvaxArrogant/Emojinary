@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "<% name %>",
+  "name": "emojirades",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
@@ -29,5 +29,8 @@
   },
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
+  },
+  "dev": {
+    "subreddit": "emojirades_dev"
   }
 }

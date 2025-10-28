@@ -9,12 +9,11 @@ export const createPost = async () => {
   return await reddit.submitCustomPost({
     splash: {
       // Splash Screen Configuration
-      appDisplayName: '<% name %>',
+      appDisplayName: 'Emojirades',
       backgroundUri: 'default-splash.png',
-      buttonLabel: 'Tap to Start',
-      description: 'An exciting interactive experience',
-      entryUri: 'index.html',
-      heading: 'Welcome to the Game!',
+      buttonLabel: 'Play Emojirades',
+      description: 'A fun multiplayer guessing game using emojis!',
+      heading: 'Welcome to Emojirades!',
       appIconUri: 'default-icon.png',
     },
     postData: {
@@ -22,6 +21,6 @@ export const createPost = async () => {
       score: 0,
     },
     subredditName: subredditName,
-    title: '<% name %>',
+    title: 'Emojirades Game',
   });
 };
