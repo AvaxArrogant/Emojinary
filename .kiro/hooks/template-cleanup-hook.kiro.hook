@@ -4,7 +4,7 @@
   "description": "Detects when a user is ready to start building their own game and offers to remove the template Three.js Earth visualization code while preserving the Devvit project structure",
   "version": "1",
   "when": {
-    "type": "fileEdited",
+    "type": "userTriggered",
     "patterns": [
       "src/client/main.ts",
       "src/server/core/post.ts",

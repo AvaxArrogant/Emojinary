@@ -4,7 +4,7 @@
   "description": "Monitors for external API/fetch requests and provides guidance on Devvit's fetch capabilities, domain allowlists, and review process",
   "version": "1",
   "when": {
-    "type": "fileEdited",
+    "type": "userTriggered",
     "patterns": [
       "src/**/*.ts",
       "src/**/*.js",

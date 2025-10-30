@@ -45,6 +45,10 @@ export const REDIS_KEYS = {
   ACTIVE_GAMES: (subreddit: string) => `active_games:${subreddit}`,
   GAME_LOBBY: (gameId: string) => `lobby:${gameId}`,
   
+  // Lobby timer management
+  LOBBY_TIMER: (gameId: string) => `lobby_timer:${gameId}`,
+  LOBBY_TIMER_SYNC: (gameId: string) => `lobby_timer_sync:${gameId}`,
+  
   // Rate limiting
   RATE_LIMIT: (playerId: string) => `rate_limit:${playerId}`,
   
@@ -92,4 +96,6 @@ export const REDIS_TTL = {
   ROUND_TIMER: 60 * 5, // 5 minutes
   GUESS_HISTORY: 60 * 30, // 30 minutes
   LOBBY_DATA: 60 * 10, // 10 minutes
-} as const;
+  LOBBY_TIMER: 60, // 1 minute (short TTL for active timers)
+  LOBBY_TIMER_SYNC: 60 * 5, // 5 minutes (sync data)
+} as const; 

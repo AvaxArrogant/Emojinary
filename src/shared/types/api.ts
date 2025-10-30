@@ -21,6 +21,7 @@ export type {
   Round,
   RoundResult,
   GameConfig,
+  LobbyTimer,
 } from './game.js';
 
 // Re-export event types
@@ -148,14 +149,53 @@ export type SubmitGuessResponse = ApiResponse<{
   roundResult?: RoundResult;
 }>;
 
+export type GameInitResponse = ApiResponse<{
+  gameState: GameState;
+  currentRound?: Round;
+  players: Record<string, Player>;
+  currentUser: Player;
+  lobbyTimer?: LobbyTimer;
+}>;
+
 export type LeaderboardResponse = ApiResponse<{
   players: Player[];
   currentUserRank: number;
-}>;
+  totalPlayers?: number;
+  subredditName?: string;
+}> & {
+  fallbackUsed?: boolean;
+  compatibilityIssue?: {
+    unsupportedMethod?: string;
+    alternativeUsed?: string;
+    error?: string;
+    issuesDetected?: string[];
+    processingTime?: number;
+  };
+};
 
 export type PhrasesResponse = ApiResponse<{
   categories: string[];
   phrases: Record<string, Phrase[]>;
+}>;
+
+export type LobbyTimerResponse = ApiResponse<{
+  timer: LobbyTimer | null;
+}>;
+
+export type LobbyTimerSyncResponse = ApiResponse<{
+  timer: LobbyTimer | null;
+  serverTime: number;
+  timeDrift: number;
+}>;
+
+export type LobbyTimerResetResponse = ApiResponse<{
+  timer: LobbyTimer | null;
+  playerCount: number;
+}>;
+
+export type AutoStartCheckResponse = ApiResponse<{
+  gameStarted: boolean;
+  gameState?: GameState;
 }>;
 
 

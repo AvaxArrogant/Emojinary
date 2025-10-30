@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useGameTimer } from '../hooks/useGameActions';
 import { useGame } from '../contexts/GameContext';
+import { useSoundEffects } from '../utils/soundEffects';
 
 export const GameTimer: React.FC = () => {
   const { 
@@ -14,11 +15,20 @@ export const GameTimer: React.FC = () => {
   
   const { currentRound } = useGame();
   const [pulseAnimation, setPulseAnimation] = useState(false);
+  const [hasPlayedWarning, setHasPlayedWarning] = useState(false);
+  const { playTimerWarning } = useSoundEffects();
 
-  // Trigger pulse animation when entering critical time
+  // Trigger pulse animation and sound when entering critical time
   useEffect(() => {
     if (isCritical) {
       setPulseAnimation(true);
+      
+      // Play warning sound only once when entering critical time
+      if (!hasPlayedWarning) {
+        playTimerWarning();
+        setHasPlayedWarning(true);
+      }
+      
       const interval = setInterval(() => {
         setPulseAnimation(prev => !prev);
       }, 500); // Pulse every 500ms
@@ -26,8 +36,9 @@ export const GameTimer: React.FC = () => {
       return () => clearInterval(interval);
     } else {
       setPulseAnimation(false);
+      setHasPlayedWarning(false);
     }
-  }, [isCritical]);
+  }, [isCritical, hasPlayedWarning, playTimerWarning]);
 
   // Don't render if no active round
   if (!currentRound || !isActive) {
@@ -73,7 +84,7 @@ export const GameTimer: React.FC = () => {
   const colors = getColorScheme();
 
   return (
-    <div className={`rounded-lg border-2 p-4 shadow-sm transition-all duration-300 ${
+    <div className={`rounded-mobile border-2 p-mobile shadow-mobile transition-all duration-300 ${
       colors.bg
     } ${
       colors.border
@@ -84,11 +95,11 @@ export const GameTimer: React.FC = () => {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-2">
           <span className="text-lg">{colors.icon}</span>
-          <h3 className={`font-semibold ${colors.text}`}>
+          <h3 className={`font-semibold ${colors.text} text-mobile-base`}>
             Round Timer
           </h3>
         </div>
-        <div className={`text-2xl font-mono font-bold ${colors.text} ${
+        <div className={`text-mobile-xl sm:text-2xl font-mono font-bold ${colors.text} ${
           isCritical ? 'animate-pulse' : ''
         }`}>
           {formattedTime}
@@ -107,7 +118,7 @@ export const GameTimer: React.FC = () => {
         </div>
         
         {/* Progress Labels */}
-        <div className="flex justify-between text-xs font-medium">
+        <div className="flex justify-between text-mobile-xs font-medium">
           <span className={colors.text}>
             {Math.floor(timeRemaining)} seconds left
           </span>
@@ -120,7 +131,7 @@ export const GameTimer: React.FC = () => {
       {/* Status Messages */}
       {isExpired && (
         <div className="mt-3 text-center">
-          <div className="text-red-600 font-semibold text-sm">
+          <div className="text-red-600 font-semibold text-mobile-sm">
             ⏰ Time's Up!
           </div>
         </div>
@@ -128,7 +139,7 @@ export const GameTimer: React.FC = () => {
       
       {isCritical && !isExpired && (
         <div className="mt-3 text-center">
-          <div className="text-red-600 font-semibold text-sm animate-bounce">
+          <div className="text-red-600 font-semibold text-mobile-sm animate-bounce">
             🚨 Final Countdown!
           </div>
         </div>
@@ -136,7 +147,7 @@ export const GameTimer: React.FC = () => {
       
       {isWarning && !isCritical && (
         <div className="mt-3 text-center">
-          <div className="text-yellow-600 font-medium text-sm">
+          <div className="text-yellow-600 font-medium text-mobile-sm">
             ⚠️ Time Running Out
           </div>
         </div>
@@ -144,7 +155,7 @@ export const GameTimer: React.FC = () => {
 
       {/* Round Info */}
       <div className="mt-3 pt-3 border-t border-gray-300">
-        <div className="flex justify-between text-xs text-gray-600">
+        <div className="flex justify-between text-mobile-xs text-gray-600">
           <span>Round {currentRound.roundNumber}</span>
           <span>2:00 total</span>
         </div>

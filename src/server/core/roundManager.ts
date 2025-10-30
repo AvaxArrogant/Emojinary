@@ -72,17 +72,48 @@ export async function startRound(gameId: string, roundNumber: number): Promise<R
       throw GameException.fromType('GAME_NOT_FOUND', 'Could not select presenter');
     }
 
-    // Create new round
+    // Select a random phrase for this round
+    const tracker: SessionPhraseTracker = {
+      gameId,
+      usedPhraseIds: new Set<string>(),
+      categoryUsageCount: {
+        movies: 0,
+        books: 0,
+        songs: 0,
+        animals: 0,
+        food: 0,
+        places: 0,
+        activities: 0,
+      },
+      difficultyUsageCount: { easy: 0, medium: 0, hard: 0 },
+      createdAt: Date.now(),
+      lastUsed: Date.now(),
+    };
+    
+    const phraseData = selectRandomPhrase(tracker);
+    if (!phraseData) {
+      throw GameException.fromType('SERVER_ERROR', 'Could not select a phrase');
+    }
+    
+    const phrase = {
+      id: phraseData.id,
+      text: phraseData.text,
+      category: 'general',
+      difficulty: phraseData.difficulty,
+      hints: phraseData.hints || [],
+    };
+
+    // Create new round with phrase already assigned
     const roundId = generateId('round');
     const round: Round = {
       id: roundId,
       gameId,
       roundNumber,
       presenterId: presenter.id,
-      phrase: { id: '', text: '', category: '', difficulty: 'easy' }, // Will be set when presenter selects phrase
+      phrase: phrase,
       emojiSequence: [],
       guesses: [],
-      status: 'waiting',
+      status: 'waiting', // Waiting for presenter to submit emojis
       startTime: Date.now(),
     };
 
@@ -137,40 +168,7 @@ export async function submitEmojis(request: SubmitEmojisRequest): Promise<Submit
       throw GameException.fromType('ROUND_NOT_ACTIVE', 'Round is not waiting for emoji submission');
     }
 
-    // Get a random phrase for the presenter
-    // Create a simple tracker for this selection
-    const tracker: SessionPhraseTracker = {
-      gameId: request.gameId,
-      usedPhraseIds: new Set<string>(),
-      categoryUsageCount: {
-        movies: 0,
-        books: 0,
-        songs: 0,
-        animals: 0,
-        food: 0,
-        places: 0,
-        activities: 0,
-      },
-      difficultyUsageCount: { easy: 0, medium: 0, hard: 0 },
-      createdAt: Date.now(),
-      lastUsed: Date.now(),
-    };
-    const phraseData = selectRandomPhrase(tracker);
-    
-    if (!phraseData) {
-      throw GameException.fromType('SERVER_ERROR', 'Could not select a phrase');
-    }
-    
-    const phrase = {
-      id: phraseData.id,
-      text: phraseData.text,
-      category: 'general', // Default category
-      difficulty: phraseData.difficulty,
-      hints: phraseData.hints || [],
-    };
-    
-    // Update round with emojis and phrase
-    round.phrase = phrase;
+    // Update round with emojis (phrase is already assigned)
     round.emojiSequence = request.emojiSequence;
     round.status = 'active';
     round.startTime = Date.now();

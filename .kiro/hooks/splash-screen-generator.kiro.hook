@@ -4,7 +4,7 @@
   "description": "Automatically creates compelling splash screens whenever there are significant changes to the game's assets. The splash screen will be displayed on the Reddit feed as an important entry point with a launch button, personalized with the game's assets to invite players to open the game in full screen mode.",
   "version": "1",
   "when": {
-    "type": "fileEdited",
+    "type": "userTriggered",
     "patterns": [
       "assets/*",
       "src/client/public/*",

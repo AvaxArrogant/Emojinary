@@ -2,6 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { usePresenterActions } from '../hooks/useGameActions';
 import { LoadingSpinner } from './LoadingScreen';
 import { GameTimer } from './GameTimer';
+import { ErrorBoundary } from './ErrorBoundary';
+import { ErrorDisplay } from './ErrorDisplay';
+import { useComponentLoading } from '../hooks/useLoadingState';
+import { useGameError } from '../hooks/useGameError';
+import { useSoundEffects } from '../utils/soundEffects';
 import { 
   getPhraseCategories, 
   getPhrasesDatabase, 
@@ -44,6 +49,7 @@ const EMOJI_CATEGORIES = {
 type EmojiCategoryKey = keyof typeof EMOJI_CATEGORIES;
 
 export const PresenterView: React.FC = () => {
+  const { play } = useSoundEffects();
   const { 
     submitEmojis, 
     canSubmitEmojis, 
@@ -52,6 +58,9 @@ export const PresenterView: React.FC = () => {
     error, 
     clearError 
   } = usePresenterActions();
+  
+  const { isLoading: componentLoading, setLoading } = useComponentLoading('presenter-view');
+  const { registerRetryableAction } = useGameError();
 
   // State for phrase selection
   const [selectedCategory, setSelectedCategory] = useState<PhraseCategory | 'all'>('all');
@@ -120,11 +129,12 @@ export const PresenterView: React.FC = () => {
   }, [clearError]);
 
   // Handle emoji selection
-  const handleEmojiSelect = useCallback((emoji: string) => {
+  const handleEmojiSelect = useCallback(async (emoji: string) => {
     if (selectedEmojis.length < 20) { // Max 20 emojis
       setSelectedEmojis(prev => [...prev, emoji]);
+      await play('emojiSelect');
     }
-  }, [selectedEmojis.length]);
+  }, [selectedEmojis.length, play]);
 
   // Remove emoji from sequence
   const handleEmojiRemove = useCallback((index: number) => {
@@ -136,11 +146,14 @@ export const PresenterView: React.FC = () => {
     setSelectedEmojis([]);
   }, []);
 
-  // Submit emoji sequence
+  // Submit emoji sequence with enhanced error handling
   const handleSubmitEmojis = useCallback(async () => {
     if (selectedEmojis.length === 0) {
       return;
     }
+    
+    setLoading(true, 'Submitting emojis...');
+    registerRetryableAction('submit-emojis', () => submitEmojis(selectedEmojis));
     
     try {
       await submitEmojis(selectedEmojis);
@@ -149,11 +162,13 @@ export const PresenterView: React.FC = () => {
       setSelectedEmojis([]);
       setShowPhraseSelection(true);
       setShowEmojiPicker(false);
-    } catch (err) {
-      // Error is handled by the hook
-      console.error('Failed to submit emojis:', err);
+    } catch (error) {
+      // Error is handled by the error handling system
+      console.error('Failed to submit emojis:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [selectedEmojis, submitEmojis]);
+  }, [selectedEmojis, submitEmojis, setLoading, registerRetryableAction]);
 
   // Go back to phrase selection
   const handleBackToPhrase = useCallback(() => {
@@ -178,16 +193,17 @@ export const PresenterView: React.FC = () => {
   }, [currentPhrase, selectedPhrase]);
 
   return (
-    <div className="space-y-6">
+    <ErrorBoundary>
+      <div className="section-spacing container-mobile">
       {/* Timer Component */}
       <GameTimer />
       
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="card-mobile p-mobile">
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-mobile-xl sm:text-2xl font-bold text-gray-900 mb-2">
             🎭 You're the Presenter!
           </h2>
-          <p className="text-gray-600">
+          <p className="text-mobile-sm sm:text-base text-gray-600">
             {showPhraseSelection 
               ? "Choose a phrase and represent it with emojis for others to guess."
               : "Build your emoji sequence to represent the phrase."
@@ -197,29 +213,30 @@ export const PresenterView: React.FC = () => {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center">
-            <span className="text-red-600 mr-2">⚠️</span>
-            <p className="text-sm text-red-800">{error}</p>
-          </div>
+        <div className="mb-6">
+          <ErrorDisplay
+            message={error}
+            variant="inline"
+            onDismiss={clearError}
+          />
         </div>
       )}
 
       {/* Phrase Selection */}
       {showPhraseSelection && (
-        <div className="space-y-6">
+        <div className="section-spacing">
           {/* Category Filter */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            <h3 className="text-mobile-lg sm:text-lg font-semibold text-gray-900 mb-3">
               Choose Category
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="nav-tabs-mobile">
               <button
                 onClick={() => setSelectedCategory('all')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                className={`btn-mobile whitespace-nowrap text-no-select ${
                   selectedCategory === 'all'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-700 hover-mobile'
                 }`}
               >
                 All Categories
@@ -228,10 +245,10 @@ export const PresenterView: React.FC = () => {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${
+                  className={`btn-mobile whitespace-nowrap capitalize text-no-select ${
                     selectedCategory === category
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-700 hover-mobile'
                   }`}
                 >
                   {category}
@@ -243,35 +260,33 @@ export const PresenterView: React.FC = () => {
           {/* Phrases List */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-mobile-lg sm:text-lg font-semibold text-gray-900">
                 Select Phrase
               </h3>
-              <span className="text-sm text-gray-500">
+              <span className="text-mobile-xs sm:text-sm text-gray-500">
                 {filteredPhrases.length} available
               </span>
             </div>
             
-            <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
+            <div className="max-h-80 sm:max-h-96 overflow-y-auto border border-gray-200 rounded-mobile">
               {filteredPhrases.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <div className="text-4xl mb-2">📝</div>
-                  <p>No phrases found in this category</p>
-                  <p className="text-sm mt-1">Try selecting "All Categories"</p>
+                  <p className="text-mobile-base">No phrases found in this category</p>
+                  <p className="text-mobile-sm mt-1">Try selecting "All Categories"</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                <div className="grid grid-cols-1 gap-0">
                   {filteredPhrases.map((phrase, index) => (
                     <button
                       key={phrase.id}
                       onClick={() => handlePhraseSelect(phrase)}
-                      className={`text-left p-4 border-b border-r border-gray-200 hover:bg-blue-50 transition-colors ${
-                        index % 2 === 1 ? 'md:border-r-0' : ''
-                      } ${
-                        index >= filteredPhrases.length - 2 ? 'border-b-0' : ''
+                      className={`text-left p-mobile border-b border-gray-200 hover:bg-blue-50 active:bg-blue-100 transition-colors min-h-[60px] text-no-select ${
+                        index >= filteredPhrases.length - 1 ? 'border-b-0' : ''
                       }`}
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <span className="font-medium text-gray-900 flex-1 mr-2">
+                        <span className="font-medium text-gray-900 flex-1 mr-2 text-mobile-base">
                           {phrase.text}
                         </span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -283,7 +298,7 @@ export const PresenterView: React.FC = () => {
                         </span>
                       </div>
                       {phrase.hints && phrase.hints.length > 0 && (
-                        <div className="text-sm text-gray-500">
+                        <div className="text-mobile-xs sm:text-sm text-gray-500">
                           💡 {phrase.hints.join(', ')}
                         </div>
                       )}
@@ -298,22 +313,22 @@ export const PresenterView: React.FC = () => {
 
       {/* Emoji Picker */}
       {showEmojiPicker && selectedPhrase && (
-        <div className="space-y-6">
+        <div className="section-spacing">
           {/* Selected Phrase Display */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-blue-900">Your Phrase:</h3>
-                <p className="text-lg font-bold text-blue-800">{selectedPhrase.text}</p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex-1">
+                <h3 className="font-semibold text-blue-900 text-sm sm:text-base">Your Phrase:</h3>
+                <p className="text-base sm:text-lg font-bold text-blue-800">{selectedPhrase.text}</p>
                 {selectedPhrase.hints && selectedPhrase.hints.length > 0 && (
-                  <p className="text-sm text-blue-600 mt-1">
+                  <p className="text-xs sm:text-sm text-blue-600 mt-1">
                     Hints: {selectedPhrase.hints.join(', ')}
                   </p>
                 )}
               </div>
               <button
                 onClick={handleBackToPhrase}
-                className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                className="btn-mobile px-3 py-2 text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 self-start sm:self-center whitespace-nowrap"
               >
                 Change Phrase
               </button>
@@ -322,12 +337,12 @@ export const PresenterView: React.FC = () => {
 
           {/* Emoji Sequence Builder */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
+              <h3 className="text-mobile-lg sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-0">
                 Your Emoji Sequence
               </h3>
               <div className="flex items-center space-x-2">
-                <span className={`text-sm font-medium ${
+                <span className={`text-mobile-sm font-medium ${
                   selectedEmojis.length >= 20 ? 'text-red-600' : 
                   selectedEmojis.length >= 15 ? 'text-yellow-600' : 'text-gray-600'
                 }`}>
@@ -336,7 +351,7 @@ export const PresenterView: React.FC = () => {
                 {selectedEmojis.length > 0 && (
                   <button
                     onClick={handleClearEmojis}
-                    className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                    className="btn-mobile text-mobile-xs px-3 py-1 bg-gray-100 text-gray-600 hover-mobile text-no-select"
                   >
                     Clear All
                   </button>
@@ -344,15 +359,15 @@ export const PresenterView: React.FC = () => {
               </div>
             </div>
             
-            <div className="min-h-20 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50">
+            <div className="min-h-20 p-mobile border-2 border-dashed border-gray-300 rounded-mobile bg-gradient-to-r from-purple-50 to-blue-50">
               {selectedEmojis.length === 0 ? (
                 <div className="text-center py-4">
                   <div className="text-4xl mb-2">👆</div>
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 text-mobile-base">
                     Select emojis below to build your sequence
                   </p>
-                  <p className="text-sm text-gray-400 mt-1">
-                    Click emojis to add them here
+                  <p className="text-mobile-sm text-gray-400 mt-1">
+                    Tap emojis to add them here
                   </p>
                 </div>
               ) : (
@@ -365,7 +380,7 @@ export const PresenterView: React.FC = () => {
                       >
                         <button
                           onClick={() => handleEmojiRemove(index)}
-                          className="text-3xl p-2 bg-white border-2 border-gray-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-all shadow-sm group-hover:scale-105"
+                          className="text-3xl sm:text-4xl p-2 sm:p-3 bg-white border-2 border-gray-200 rounded-mobile hover:bg-red-50 hover:border-red-300 transition-all shadow-mobile group-hover:scale-105 text-no-select"
                           title={`Remove ${emoji} (position ${index + 1})`}
                         >
                           {emoji}
@@ -378,7 +393,7 @@ export const PresenterView: React.FC = () => {
                   </div>
                   
                   <div className="text-center">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-mobile-sm text-gray-600 text-selectable">
                       Preview: {selectedEmojis.join(' ')}
                     </p>
                   </div>
@@ -390,10 +405,10 @@ export const PresenterView: React.FC = () => {
               <div className="mt-4">
                 <button
                   onClick={handleSubmitEmojis}
-                  disabled={!canSubmitEmojis || loading}
-                  className="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-medium transition-colors"
+                  disabled={!canSubmitEmojis || loading || componentLoading}
+                  className="btn-mobile-large w-full bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-no-select"
                 >
-                  {loading ? (
+                  {(loading || componentLoading) ? (
                     <>
                       <LoadingSpinner size="small" color="gray" />
                       <span className="ml-2">Submitting...</span>
@@ -406,7 +421,7 @@ export const PresenterView: React.FC = () => {
                   )}
                 </button>
                 
-                <p className="text-xs text-gray-500 text-center mt-2">
+                <p className="text-mobile-xs text-gray-500 text-center mt-2">
                   Once submitted, other players will see your emojis and start guessing!
                 </p>
               </div>
@@ -417,26 +432,26 @@ export const PresenterView: React.FC = () => {
           <div>
             <div className="relative">
               <input
-                type="text"
+                type="search"
                 placeholder="Search emojis (e.g., 'happy', 'food', 'car')..."
                 value={emojiSearchQuery}
                 onChange={(e) => setEmojiSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-mobile-large w-full pl-12 pr-12"
               />
-              <div className="absolute left-3 top-2.5 text-gray-400">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg">
                 🔍
               </div>
               {emojiSearchQuery && (
                 <button
                   onClick={() => setEmojiSearchQuery('')}
-                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg p-1"
                 >
                   ✕
                 </button>
               )}
             </div>
             {emojiSearchQuery && filteredEmojis.length === 0 && (
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-mobile-sm text-gray-500 mt-2">
                 No emojis found for "{emojiSearchQuery}". Try different keywords.
               </p>
             )}
@@ -444,15 +459,15 @@ export const PresenterView: React.FC = () => {
 
           {/* Emoji Category Tabs */}
           <div>
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="nav-tabs-mobile mb-4">
               {Object.entries(EMOJI_CATEGORIES).map(([key, category]) => (
                 <button
                   key={key}
                   onClick={() => setSelectedEmojiCategory(key as EmojiCategoryKey)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`btn-mobile whitespace-nowrap text-mobile-sm font-medium text-no-select ${
                     selectedEmojiCategory === key
                       ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-700 hover-mobile'
                   }`}
                 >
                   {category.name}
@@ -461,23 +476,23 @@ export const PresenterView: React.FC = () => {
             </div>
 
             {/* Emoji Grid */}
-            <div className="border border-gray-200 rounded-lg bg-gray-50">
-              <div className="p-3 border-b border-gray-200 bg-gray-100 rounded-t-lg">
+            <div className="border border-gray-200 rounded-mobile bg-gray-50">
+              <div className="p-mobile border-b border-gray-200 bg-gray-100 rounded-t-lg">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-gray-900">
+                  <h4 className="font-medium text-gray-900 text-mobile-base">
                     {EMOJI_CATEGORIES[selectedEmojiCategory].name}
                   </h4>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-mobile-sm text-gray-500">
                     {filteredEmojis.length} emoji{filteredEmojis.length !== 1 ? 's' : ''}
                   </span>
                 </div>
               </div>
               
-              <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-15 gap-1 max-h-64 overflow-y-auto p-4">
+              <div className="emoji-grid-large max-h-64 overflow-y-auto p-mobile">
                 {filteredEmojis.length === 0 ? (
                   <div className="col-span-full text-center py-8 text-gray-500">
                     <div className="text-4xl mb-2">🔍</div>
-                    <p>No emojis found</p>
+                    <p className="text-mobile-base">No emojis found</p>
                   </div>
                 ) : (
                   filteredEmojis.map((emoji, index) => (
@@ -485,7 +500,7 @@ export const PresenterView: React.FC = () => {
                       key={index}
                       onClick={() => handleEmojiSelect(emoji)}
                       disabled={selectedEmojis.length >= 20}
-                      className="text-2xl p-2 hover:bg-white hover:shadow-sm hover:scale-110 rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                      className="emoji-button-large hover:bg-white hover:shadow-mobile disabled:opacity-50 disabled:cursor-not-allowed"
                       title={`Add ${emoji} (${selectedEmojis.length}/20)`}
                     >
                       {emoji}
@@ -495,8 +510,8 @@ export const PresenterView: React.FC = () => {
               </div>
               
               {selectedEmojis.length >= 20 && (
-                <div className="p-3 border-t border-gray-200 bg-yellow-50">
-                  <p className="text-sm text-yellow-800 text-center">
+                <div className="p-mobile border-t border-gray-200 bg-yellow-50">
+                  <p className="text-mobile-sm text-yellow-800 text-center">
                     ⚠️ Maximum 20 emojis reached. Remove some to add more.
                   </p>
                 </div>
@@ -506,6 +521,7 @@ export const PresenterView: React.FC = () => {
         </div>
       )}
       </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };

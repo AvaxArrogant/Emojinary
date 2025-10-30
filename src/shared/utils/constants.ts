@@ -8,6 +8,12 @@ export const GAME_CONSTANTS = {
   COUNTDOWN_INTERVAL_MS: 1000, // 1 second
   ROUND_TRANSITION_DELAY_MS: 5000, // 5 seconds between rounds
   
+  // Lobby Timer
+  LOBBY_COUNTDOWN_DURATION: 30000, // 30 seconds
+  LOBBY_TIMER_UPDATE_INTERVAL: 1000, // 1 second
+  LOBBY_TIMER_WARNING_THRESHOLDS: [10000, 5000], // 10s, 5s warnings
+  LOBBY_TIMER_SYNC_INTERVAL: 5000, // 5 seconds for server sync
+  
   // Limits
   MAX_PLAYERS_PER_GAME: 8,
   MIN_PLAYERS_TO_START: 2,

@@ -116,7 +116,7 @@ export async function joinGame(request: JoinGameRequest): Promise<JoinGameRespon
     }
 
     // Get current players
-    const playersData = await redis.hgetall(REDIS_KEYS.PLAYERS(request.gameId));
+    const playersData = await redis.hGetAll(REDIS_KEYS.PLAYERS(request.gameId));
     const players: Player[] = Object.values(playersData)
       .filter(data => data !== 'true') // Filter out the 'initialized' marker
       .map(data => JSON.parse(data));
@@ -128,10 +128,9 @@ export async function joinGame(request: JoinGameRequest): Promise<JoinGameRespon
       existingPlayer.isActive = true;
       existingPlayer.joinedAt = Date.now();
       
-      await redis.hset(
+      await redis.hSet(
         REDIS_KEYS.PLAYERS(request.gameId),
-        existingPlayer.id,
-        JSON.stringify(existingPlayer)
+        { [existingPlayer.id]: JSON.stringify(existingPlayer) }
       );
     } else {
       // Check player limit
@@ -226,7 +225,7 @@ export async function startGame(request: StartGameRequest): Promise<StartGameRes
     }
 
     // Get current players
-    const playersData = await redis.hgetall(REDIS_KEYS.PLAYERS(request.gameId));
+    const playersData = await redis.hGetAll(REDIS_KEYS.PLAYERS(request.gameId));
     const players: Player[] = Object.values(playersData)
       .filter(data => data !== 'true') // Filter out the 'initialized' marker
       .map(data => JSON.parse(data))
@@ -316,7 +315,7 @@ export async function getGameState(gameId: string, username: string): Promise<Ga
     const gameState: GameState = JSON.parse(gameStateData);
 
     // Get players
-    const playersData = await redis.hgetall(REDIS_KEYS.PLAYERS(gameId));
+    const playersData = await redis.hGetAll(REDIS_KEYS.PLAYERS(gameId));
     const players: Player[] = Object.values(playersData)
       .filter(data => data !== 'true') // Filter out the 'initialized' marker
       .map(data => JSON.parse(data));

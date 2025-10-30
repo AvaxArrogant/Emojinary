@@ -12,6 +12,7 @@ export * from './redis.js';
 
 // Default exports for commonly used items
 export { DEFAULT_GAME_CONFIG } from './game.js';
+export type { LobbyTimer } from './game.js';
 export { REDIS_KEYS, REDIS_TTL } from './redis.js';
 export { ERROR_MESSAGES, GameException, createGameError } from './errors.js';
 export { 

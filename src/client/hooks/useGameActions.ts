@@ -5,7 +5,7 @@ import { useGame } from '../contexts/GameContext';
  * Custom hook for game lifecycle actions
  */
 export const useGameActions = () => {
-  const { joinGame, startGame, leaveGame, loading, error, clearError } = useGame();
+  const { joinGame, startGame, leaveGame, refreshGameState, loading, error, clearError } = useGame();
 
   const handleJoinGame = useCallback(async () => {
     clearError();
@@ -22,10 +22,16 @@ export const useGameActions = () => {
     await leaveGame();
   }, [leaveGame, clearError]);
 
+  const handleRefreshGameState = useCallback(async () => {
+    clearError();
+    await refreshGameState();
+  }, [refreshGameState, clearError]);
+
   return {
     joinGame: handleJoinGame,
     startGame: handleStartGame,
     leaveGame: handleLeaveGame,
+    refreshGameState: handleRefreshGameState,
     loading,
     error,
     clearError,

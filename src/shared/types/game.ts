@@ -7,6 +7,14 @@ export type RoundStatus = 'waiting' | 'active' | 'ended';
 export type PhraseDifficulty = 'easy' | 'medium' | 'hard';
 export type PlayerRole = 'presenter' | 'guesser';
 
+export type LobbyTimer = {
+  isActive: boolean;
+  startTime: number;
+  duration: number;
+  remainingTime: number;
+  lastSyncTime: number;
+};
+
 export type GameState = {
   id: string;
   subredditName: string;
@@ -15,6 +23,8 @@ export type GameState = {
   maxRounds: number;
   createdAt: number;
   updatedAt: number;
+  moderatorId?: string;
+  lobbyTimer?: LobbyTimer;
 };
 
 export type Player = {
@@ -24,6 +34,7 @@ export type Player = {
   score: number;
   isActive: boolean;
   joinedAt: number;
+  isModerator?: boolean;
 };
 
 export type Phrase = {
@@ -96,3 +107,16 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
   maxGuessLength: 100,
   maxEmojiSequenceLength: 20,
 };
+
+// ============================================================================
+// LOBBY TIMER CONFIGURATION
+// ============================================================================
+
+export const LOBBY_TIMER_CONFIG = {
+  COUNTDOWN_DURATION: 30000, // 30 seconds
+  MIN_PLAYERS_FOR_TIMER: 2,
+  SYNC_INTERVAL: 5000, // 5 seconds
+  WARNING_THRESHOLDS: [10000, 5000], // 10s, 5s warnings
+  RESET_ON_JOIN: true,
+  MAX_PLAYERS: 8,
+} as const;

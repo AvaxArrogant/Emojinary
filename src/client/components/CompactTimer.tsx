@@ -35,13 +35,13 @@ export const CompactTimer: React.FC<CompactTimerProps> = ({
   };
 
   return (
-    <div className={`inline-flex items-center px-3 py-1 rounded-lg border font-mono font-semibold text-sm transition-all ${getTimerStyle()} ${className}`}>
+    <div className={`inline-flex items-center px-3 py-2 rounded-mobile border font-mono font-semibold text-mobile-sm transition-all ${getTimerStyle()} ${className}`}>
       {showIcon && (
-        <span className="mr-2">
+        <span className="mr-2 text-base">
           {isCritical ? '🚨' : isWarning ? '⚠️' : '⏰'}
         </span>
       )}
-      {formattedTime}
+      <span className="whitespace-nowrap">{formattedTime}</span>
     </div>
   );
 };

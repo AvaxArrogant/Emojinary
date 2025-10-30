@@ -1,1 +1,1041 @@
 @import 'tailwindcss';
+
+/* Mobile-first responsive design utilities */
+@layer base {
+  /* Ensure proper viewport handling */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    /* Prevent horizontal scrolling on mobile */
+    overflow-x: hidden;
+  }
+  
+  body {
+    /* Prevent horizontal scrolling */
+    overflow-x: hidden;
+    /* Improve font rendering on mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Improve touch targets on mobile */
+  button, 
+  input, 
+  select, 
+  textarea {
+    min-height: 44px; /* iOS recommended minimum touch target */
+    /* Improve touch responsiveness */
+    touch-action: manipulation;
+  }
+  
+  /* Prevent zoom on input focus on iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea {
+    font-size: 16px;
+    /* Prevent iOS zoom on focus */
+    transform: translateZ(0);
+  }
+  
+  /* Smooth scrolling for better mobile experience */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Improve mobile scrolling performance */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@layer components {
+  /* Mobile-optimized button styles */
+  .btn-mobile {
+    @apply min-h-[44px] px-4 py-3 text-base font-medium rounded-lg transition-all duration-200;
+    @apply active:scale-95;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    /* Improve touch feedback */
+    @apply select-none;
+    touch-action: manipulation;
+  }
+  
+  /* Large touch-friendly buttons for primary actions */
+  .btn-mobile-large {
+    @apply min-h-[52px] px-6 py-4 text-lg font-semibold rounded-xl;
+    @apply transition-all duration-200 active:scale-95;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply select-none;
+    touch-action: manipulation;
+  }
+  
+  /* Touch-friendly emoji buttons */
+  .emoji-button {
+    @apply min-h-[44px] min-w-[44px] text-2xl p-2 rounded-lg transition-all duration-200;
+    @apply hover:scale-110 active:scale-95 active:bg-gray-100;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply select-none;
+    touch-action: manipulation;
+  }
+  
+  /* Large emoji buttons for mobile */
+  .emoji-button-large {
+    @apply min-h-[48px] min-w-[48px] text-3xl p-2 rounded-xl;
+    @apply transition-all duration-200 active:scale-95;
+    @apply hover:bg-gray-100 active:bg-gray-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+    @apply select-none;
+    touch-action: manipulation;
+  }
+  
+  /* Mobile-optimized input fields */
+  .input-mobile {
+    @apply min-h-[44px] px-4 py-3 text-base border border-gray-300 rounded-lg;
+    @apply focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    /* Prevent zoom on iOS */
+    font-size: 16px;
+  }
+  
+  /* Large input for mobile */
+  .input-mobile-large {
+    @apply min-h-[52px] px-4 py-4 text-lg border-2 border-gray-300 rounded-xl;
+    @apply focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    font-size: 16px;
+  }
+  
+  /* Responsive grid for emoji picker */
+  .emoji-grid {
+    @apply grid gap-1;
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  }
+  
+  /* Large emoji grid for mobile */
+  .emoji-grid-large {
+    @apply grid gap-2;
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  }
+  
+  /* Mobile-friendly card layout */
+  .card-mobile {
+    @apply bg-white rounded-lg shadow-md;
+    @apply mx-4 sm:mx-0 sm:rounded-xl sm:shadow-lg;
+  }
+  
+  /* Full-width mobile card */
+  .card-mobile-full {
+    @apply bg-white rounded-none shadow-md;
+    @apply sm:rounded-xl sm:shadow-lg sm:mx-0;
+  }
+  
+  /* Responsive spacing */
+  .section-spacing {
+    @apply space-y-4 sm:space-y-6;
+  }
+  
+  /* Compact spacing for mobile */
+  .section-spacing-compact {
+    @apply space-y-3 sm:space-y-4;
+  }
+  
+  /* Mobile navigation tabs */
+  .nav-tabs-mobile {
+    @apply flex overflow-x-auto;
+    @apply -mx-4 px-4 sm:mx-0 sm:px-0;
+    @apply gap-2 pb-2;
+    /* Hide scrollbar */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .nav-tabs-mobile::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Sticky mobile tabs */
+  .nav-tabs-sticky {
+    @apply sticky top-0 z-10 bg-white border-b border-gray-200;
+    @apply -mx-4 px-4 py-3 sm:mx-0 sm:px-0;
+  }
+  
+  /* Hide scrollbar for mobile tabs */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Mobile-optimized text selection */
+  .text-selectable {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  
+  /* Prevent text selection for UI elements */
+  .text-no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+@layer utilities {
+  /* Enhanced animations and visual feedback */
+  .animate-bounce-gentle {
+    animation: bounce-gentle 1s ease-in-out infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+  
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scale-in 0.2s ease-out;
+  }
+  
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
+  
+  .animate-success-pulse {
+    animation: success-pulse 0.6s ease-out;
+  }
+  
+  .animate-error-shake {
+    animation: error-shake 0.5s ease-in-out;
+  }
+  
+  /* Hover and focus animations */
+  .hover-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .focus-ring-animated {
+    transition: box-shadow 0.2s ease-out;
+  }
+  
+  .focus-ring-animated:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  }
+  
+  /* Loading states */
+  .loading-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  .loading-dots::after {
+    content: '';
+    animation: loading-dots 1.5s infinite;
+  }
+  
+  /* Safe area padding for mobile devices with notches */
+  .safe-area-padding {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Safe area padding for specific sides */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Mobile-specific text sizes */
+  .text-mobile-xs { font-size: 12px; line-height: 16px; }
+  .text-mobile-sm { font-size: 14px; line-height: 20px; }
+  .text-mobile-base { font-size: 16px; line-height: 24px; }
+  .text-mobile-lg { font-size: 18px; line-height: 28px; }
+  .text-mobile-xl { font-size: 20px; line-height: 28px; }
+  .text-mobile-2xl { font-size: 24px; line-height: 32px; }
+  .text-mobile-3xl { font-size: 30px; line-height: 36px; }
+  
+  /* Touch-friendly spacing */
+  .touch-spacing { @apply space-y-3 sm:space-y-4; }
+  .touch-spacing-large { @apply space-y-4 sm:space-y-6; }
+  
+  /* Mobile-optimized max widths */
+  .max-w-mobile { max-width: calc(100vw - 2rem); }
+  .max-w-mobile-full { max-width: 100vw; }
+  
+  /* Mobile-specific padding */
+  .px-mobile { @apply px-4 sm:px-6; }
+  .py-mobile { @apply py-4 sm:py-6; }
+  .p-mobile { @apply p-4 sm:p-6; }
+  
+  /* Mobile-specific margins */
+  .mx-mobile { @apply mx-4 sm:mx-6; }
+  .my-mobile { @apply my-4 sm:my-6; }
+  .m-mobile { @apply m-4 sm:m-6; }
+  
+  /* Mobile container */
+  .container-mobile {
+    max-width: calc(100vw - 2rem);
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Full-width mobile container */
+  .container-mobile-full {
+    @apply w-full px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Mobile-optimized flex layouts */
+  .flex-mobile-col {
+    @apply flex flex-col sm:flex-row;
+  }
+  
+  .flex-mobile-row {
+    @apply flex flex-row;
+  }
+  
+  /* Mobile-specific grid layouts */
+  .grid-mobile-1 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  .grid-mobile-2 {
+    @apply grid grid-cols-1 lg:grid-cols-2;
+  }
+  
+  /* Mobile-optimized aspect ratios */
+  .aspect-mobile-square {
+    @apply aspect-square;
+  }
+  
+  /* Mobile-specific z-index values */
+  .z-mobile-overlay { z-index: 1000; }
+  .z-mobile-modal { z-index: 1050; }
+  .z-mobile-tooltip { z-index: 1100; }
+  
+  /* Mobile-optimized shadows */
+  .shadow-mobile {
+    @apply shadow-md sm:shadow-lg;
+  }
+  
+  /* Mobile-specific border radius */
+  .rounded-mobile {
+    @apply rounded-lg sm:rounded-xl;
+  }
+  
+  /* Landscape orientation utilities */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .landscape-compact {
+      @apply py-2;
+    }
+    
+    .landscape-hide {
+      @apply hidden;
+    }
+    
+    .landscape-text-sm {
+      @apply text-sm;
+    }
+    
+    /* Optimize for landscape mobile */
+    .landscape-mobile-header {
+      @apply py-2 text-center;
+    }
+    
+    .landscape-mobile-content {
+      @apply space-y-2;
+    }
+    
+    .landscape-mobile-grid {
+      @apply grid-cols-2 gap-2;
+    }
+  }
+  
+  /* Portrait orientation utilities */
+  @media (orientation: portrait) {
+    .portrait-show {
+      @apply block;
+    }
+    
+    .portrait-hide {
+      @apply hidden;
+    }
+    
+    /* Optimize for portrait mobile */
+    .portrait-mobile-header {
+      @apply py-6 text-center;
+    }
+    
+    .portrait-mobile-content {
+      @apply space-y-4;
+    }
+    
+    .portrait-mobile-grid {
+      @apply grid-cols-1 gap-4;
+    }
+  }
+  
+  /* Cross-platform consistency utilities */
+  .cross-platform-button {
+    @apply min-h-[44px] px-4 py-3 text-base font-medium rounded-lg;
+    @apply transition-all duration-200 active:scale-95;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply select-none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .cross-platform-input {
+    @apply min-h-[44px] px-4 py-3 text-base border border-gray-300 rounded-lg;
+    @apply focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    font-size: 16px; /* Prevent zoom on iOS */
+    -webkit-appearance: none;
+  }
+  
+  .cross-platform-text {
+    @apply text-base leading-relaxed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .cross-platform-card {
+    @apply bg-white rounded-lg shadow-md border border-gray-200;
+    @apply transition-shadow duration-200;
+  }
+  
+  /* Ensure consistent spacing across platforms */
+  .platform-spacing-xs { @apply space-y-2; }
+  .platform-spacing-sm { @apply space-y-3; }
+  .platform-spacing-md { @apply space-y-4; }
+  .platform-spacing-lg { @apply space-y-6; }
+  
+  /* Platform-specific optimizations */
+  @supports (-webkit-touch-callout: none) {
+    /* iOS-specific styles */
+    .ios-optimized {
+      -webkit-overflow-scrolling: touch;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .ios-safe-area {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+  }
+  
+  /* Android-specific optimizations */
+  @media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
+    .android-optimized {
+      /* Android Chrome specific styles */
+      overscroll-behavior: contain;
+    }
+  }
+  
+  /* Mobile-specific hover states (only on devices that support hover) */
+  @media (hover: hover) {
+    .hover-mobile:hover {
+      @apply bg-gray-100;
+    }
+  }
+}
+
+/* Keyframe animations */
+@keyframes bounce-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-down {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes success-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
+  100% { transform: scale(1); }
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes loading-dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+  100% { content: ''; }
+}
+
+/* Sound effect visual feedback */
+.sound-enabled {
+  position: relative;
+}
+
+.sound-enabled::after {
+  content: '🔊';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.sound-disabled::after {
+  content: '🔇';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* Celebration effects */
+.celebration-confetti {
+  position: relative;
+  overflow: hidden;
+}
+
+.celebration-confetti::before {
+  content: '🎉';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  animation: confetti-fall 2s ease-out;
+  pointer-events: none;
+}
+
+@keyframes confetti-fall {
+  0% { 
+    transform: translateX(-50%) translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(-50%) translateY(100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Enhanced game-specific animations */
+.animate-correct-guess {
+  animation: correct-guess 0.8s ease-out;
+}
+
+.animate-wrong-guess {
+  animation: wrong-guess 0.5s ease-out;
+}
+
+.animate-round-start {
+  animation: round-start 0.6s ease-out;
+}
+
+.animate-timer-warning {
+  animation: timer-warning 1s ease-in-out infinite;
+}
+
+.animate-presenter-highlight {
+  animation: presenter-highlight 2s ease-in-out infinite;
+}
+
+.animate-emoji-pop {
+  animation: emoji-pop 0.3s ease-out;
+}
+
+.animate-score-increase {
+  animation: score-increase 0.6s ease-out;
+}
+
+.animate-leaderboard-update {
+  animation: leaderboard-update 0.4s ease-out;
+}
+
+/* Enhanced player list animations */
+.animate-player-join {
+  animation: player-join 0.4s ease-out;
+}
+
+.animate-player-leave {
+  animation: player-leave 0.3s ease-in;
+}
+
+.animate-player-highlight {
+  animation: player-highlight 0.6s ease-out;
+}
+
+.animate-capacity-warning {
+  animation: capacity-warning 1s ease-in-out infinite;
+}
+
+.animate-count-update {
+  animation: count-update 0.3s ease-out;
+}
+
+/* Animation delay utilities */
+.animation-delay-50ms { animation-delay: 50ms; }
+.animation-delay-100ms { animation-delay: 100ms; }
+.animation-delay-150ms { animation-delay: 150ms; }
+.animation-delay-200ms { animation-delay: 200ms; }
+.animation-delay-250ms { animation-delay: 250ms; }
+
+/* Game state transitions */
+.game-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.game-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.game-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.game-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* Interactive feedback */
+.button-press-feedback {
+  transition: all 0.1s ease-out;
+}
+
+.button-press-feedback:active {
+  transform: scale(0.95);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.emoji-select-feedback {
+  transition: all 0.2s ease-out;
+}
+
+.emoji-select-feedback:hover {
+  transform: scale(1.1);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.emoji-select-feedback:active {
+  transform: scale(1.05);
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+}
+
+.typing-indicator::after {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
+  margin-left: 4px;
+  animation: typing-blink 1s infinite;
+}
+
+/* Connection quality indicators */
+.connection-excellent {
+  color: #10b981;
+}
+
+.connection-good {
+  color: #f59e0b;
+}
+
+.connection-poor {
+  color: #ef4444;
+  animation: connection-warning 2s ease-in-out infinite;
+}
+
+/* Game flow animations */
+.round-transition {
+  animation: round-transition 0.5s ease-in-out;
+}
+
+.presenter-change {
+  animation: presenter-change 0.8s ease-out;
+}
+
+.game-complete {
+  animation: game-complete 1s ease-out;
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 768px) {
+  .mobile-tap-highlight {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.2);
+  }
+  
+  .mobile-scroll-momentum {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-safe-area {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Accessibility enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-bounce-gentle,
+  .animate-pulse-slow,
+  .animate-slide-up,
+  .animate-slide-down,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-wiggle,
+  .animate-success-pulse,
+  .animate-error-shake,
+  .animate-correct-guess,
+  .animate-wrong-guess,
+  .animate-round-start,
+  .animate-timer-warning,
+  .animate-presenter-highlight,
+  .animate-emoji-pop,
+  .animate-score-increase,
+  .animate-leaderboard-update {
+    animation: none;
+  }
+  
+  .hover-lift:hover {
+    transform: none;
+  }
+}
+
+/* Performance optimization classes */
+.animations-disabled * {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+.particles-disabled .celebration-confetti::before {
+  display: none;
+}
+
+.render-low {
+  /* Reduce visual complexity for low-end devices */
+}
+
+.render-low .shadow-lg {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.render-low .bg-gradient-to-br {
+  background: #f8fafc; /* Solid color instead of gradient */
+}
+
+.render-medium {
+  /* Balanced performance and quality */
+}
+
+.render-medium .shadow-lg {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.render-high {
+  /* Full visual effects */
+}
+
+/* Performance-aware animations */
+.performance-optimized {
+  will-change: transform, opacity;
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .btn-mobile,
+  .btn-mobile-large {
+    border: 2px solid currentColor;
+  }
+  
+  .emoji-button,
+  .emoji-button-large {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Keyframes for new animations */
+@keyframes correct-guess {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.05); background-color: rgba(34, 197, 94, 0.1); }
+  50% { transform: scale(1.1); background-color: rgba(34, 197, 94, 0.2); }
+  75% { transform: scale(1.05); background-color: rgba(34, 197, 94, 0.1); }
+  100% { transform: scale(1); background-color: transparent; }
+}
+
+@keyframes wrong-guess {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+@keyframes round-start {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.8) rotate(-5deg); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.05) rotate(2deg); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) rotate(0deg); 
+  }
+}
+
+@keyframes timer-warning {
+  0%, 100% { 
+    color: inherit; 
+    transform: scale(1); 
+  }
+  50% { 
+    color: #ef4444; 
+    transform: scale(1.05); 
+  }
+}
+
+@keyframes presenter-highlight {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); 
+  }
+  50% { 
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1); 
+  }
+}
+
+@keyframes emoji-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes score-increase {
+  0% { 
+    transform: translateY(0) scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateY(-20px) scale(1); 
+    opacity: 0; 
+  }
+}
+
+@keyframes leaderboard-update {
+  0% { background-color: transparent; }
+  50% { background-color: rgba(59, 130, 246, 0.1); }
+  100% { background-color: transparent; }
+}
+
+@keyframes player-join {
+  0% { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.95); 
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: translateY(-5px) scale(1.02); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+@keyframes player-leave {
+  0% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-20px) scale(0.95); 
+  }
+}
+
+@keyframes player-highlight {
+  0% { 
+    background-color: transparent; 
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); 
+  }
+  50% { 
+    background-color: rgba(59, 130, 246, 0.1); 
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); 
+  }
+  100% { 
+    background-color: transparent; 
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); 
+  }
+}
+
+@keyframes capacity-warning {
+  0%, 100% { 
+    color: inherit; 
+    transform: scale(1); 
+  }
+  50% { 
+    color: #dc2626; 
+    transform: scale(1.05); 
+  }
+}
+
+@keyframes count-update {
+  0% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.1); 
+    color: #059669; 
+  }
+  100% { 
+    transform: scale(1); 
+  }
+}
+
+@keyframes typing-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes connection-warning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes round-transition {
+  0% { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+  50% { 
+    opacity: 0; 
+    transform: translateX(-100px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes presenter-change {
+  0% { 
+    transform: scale(1) rotate(0deg); 
+    border-color: transparent; 
+  }
+  25% { 
+    transform: scale(1.05) rotate(2deg); 
+    border-color: rgba(59, 130, 246, 0.5); 
+  }
+  50% { 
+    transform: scale(1.1) rotate(-1deg); 
+    border-color: rgba(59, 130, 246, 0.8); 
+  }
+  75% { 
+    transform: scale(1.05) rotate(1deg); 
+    border-color: rgba(59, 130, 246, 0.5); 
+  }
+  100% { 
+    transform: scale(1) rotate(0deg); 
+    border-color: transparent; 
+  }
+}
+
+@keyframes game-complete {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.5) rotate(-10deg); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.1) rotate(5deg); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) rotate(0deg); 
+  }
+}
